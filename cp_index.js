@@ -15,7 +15,7 @@ app.get("/", (req, res) => res.send("BashSearch API v1.8 - SRE Blindada Online")
 app.post("/search", async (req, res) => {
     const { prompt } = req.body;
     try {
-        const model = genAI.getGenerativeModel({ 
+        const model = genAI.getGenerativeModel({
             model: "gemini-3.1-flash-lite",
             systemInstruction: "Você é o Sentinela-Bash IA. Retorne o comando Termux precedido por $, uma explicação simples e como instalar."
         });
