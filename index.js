@@ -7,33 +7,43 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Keep-alive SRE
-setInterval(async () => {
-    try {
-        const url = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
-        await axios.get(url);
-        console.log("Ping Keep-alive: OK");
-    } catch (e) { console.log("Ping Keep-alive: Silent"); }
-}, 840000);
-
-app.get("/", (req, res) => res.send("BashSearch API v1.5 [bash-eee21] Online"));
+app.get("/", (req, res) => res.send("BashSearch API v1.8 - Diagnóstico Ativo"));
 
 app.post("/search", async (req, res) => {
     const { prompt } = req.body;
-    if (!prompt) return res.status(400).json({ error: "Prompt vazio" });
+    console.log(`🔍 Recebido: ${prompt}`);
+
+    if (!process.env.GEMINI_API_KEY) {
+        console.error("❌ ERRO: GEMINI_API_KEY não configurada no Render!");
+        return res.status(500).json({ error: "Configuração ausente no servidor." });
+    }
+
     try {
+        // Usando o modelo padrão estável
         const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash-lite",
-            systemInstruction: "Você é o Sentinela-Bash IA. Retorne o comando Termux precedido por $, uma explicação simples de uma linha e o comando de instalação 'pkg install'. Use Markdown estrito com blocos de código."
+            model: "gemini-1.5-flash",
+            systemInstruction: "Você é o Sentinela-Bash IA. Forneça o comando Termux com $, explicação curta e pkg install. Use Markdown."
         });
+
         const result = await model.generateContent(prompt);
-        res.json({ resposta: result.response.text() });
-    } catch (e) {
-        res.status(500).json({ error: "Erro na IA" });
+        const response = await result.response;
+        const text = response.text();
+        
+        console.log("✅ IA respondeu com sucesso.");
+        res.json({ resposta: text });
+
+    } catch (error) {
+        console.error("❌ ERRO DETALHADO NA IA:", error.message);
+        res.status(500).json({ error: `Erro na IA: ${error.message}` });
     }
 });
 
-app.listen(PORT, () => console.log(`Backend online na porta ${PORT}`));
+app.listen(PORT, () => console.log(`Servidor v1.8 online na porta ${PORT}`));
+
+// Keep-alive
+setInterval(() => {
+    axios.get("https://bash-search-backend.onrender.com").catch(() => {});
+}, 840000);
