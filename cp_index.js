@@ -16,7 +16,7 @@ app.post("/search", async (req, res) => {
     const { prompt } = req.body;
     try {
         const model = genAI.getGenerativeModel({ 
-            model: "gemini-1.5-flash",
+            model: "gemini-3.1-flash-lite",
             systemInstruction: "Você é o Sentinela-Bash IA. Retorne o comando Termux precedido por $, uma explicação simples e como instalar."
         });
         const result = await model.generateContent(prompt);
