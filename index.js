@@ -4,10 +4,25 @@ const cors = require("cors");
 const axios = require("axios");
 const admin = require("firebase-admin");
 
-// --- 1. CONFIGURAÇÃO DE MEMÓRIA (SRE CORE) ---
-const serviceAccount = require("./serviceAccountKey.json");
+// --- 1. CONFIGURAÇÃO DE MEMÓRIA HÍBRIDA (SRE CORE) ---
+// Esta lógica permite rodar no Termux (arquivo) e no Render (variável)
+let serviceAccount;
 
-if (!admin.apps.length) {
+try {
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+        // Se estiver no Render, decodifica a string JSON da variável de ambiente
+        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        console.log("🚀 Firebase: Carregado via Environment Variable");
+    } else {
+        // Se estiver no Termux, usa o arquivo local
+        serviceAccount = require("./serviceAccountKey.json");
+        console.log("📱 Firebase: Carregado via Arquivo Local");
+    }
+} catch (error) {
+    console.error("❌ ERRO CRÍTICO NA CARGA DE CREDENCIAIS:", error.message);
+}
+
+if (!admin.apps.length && serviceAccount) {
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount)
     });
@@ -22,9 +37,9 @@ const PORT = process.env.PORT || 10000;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // --- 2. ENDPOINT DE SAÚDE ---
-app.get("/", (req, res) => res.send("BashSearch API v2.0 - SRE Stateful Online"));
+app.get("/", (req, res) => res.send("BashSearch API v2.1 - SRE Stateful Híbrida Online"));
 
-// --- 3. NÚCLEO DE BUSCA E PERSISTÊNCIA ---
+// --- 3. NÚCLEO DE BUSCA E PERSISTÊNCIA (SINCRO ATUALIZADA) ---
 app.post("/search", async (req, res) => {
     const { prompt } = req.body;
     try {
@@ -36,12 +51,12 @@ app.post("/search", async (req, res) => {
         const result = await model.generateContent(prompt);
         const respostaTexto = result.response.text();
 
-        // SALVAMENTO ATÔMICO NO FIRESTORE
+        // SALVAMENTO ATÔMICO NO FIRESTORE (Lógica Preservada)
         await db.collection("historico").add({
             usuario_query: prompt,
             ia_resposta: respostaTexto,
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
-            versao: "2.0-stateful"
+            versao: "2.1-stateful-hybrid"
         });
 
         res.json({ resposta: respostaTexto });
@@ -51,7 +66,7 @@ app.post("/search", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`✅ Servidor v2.0 Rodando na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Servidor v2.1 Rodando na porta ${PORT}`));
 
 // Keep-alive (Evitar Hibernação do Render)
 setInterval(() => {
