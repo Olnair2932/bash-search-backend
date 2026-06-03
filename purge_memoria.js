@@ -1,12 +1,4 @@
 const admin = require('firebase-admin');
-const fs = require('fs');
-
-// Validação Crítica de Credenciais
-if (!fs.existsSync('./serviceAccountKey.json')) {
-    console.error("[CRITICAL] serviceAccountKey.json ausente. Abortando operação SRE.");
-    process.exit(1);
-}
-
 const serviceAccount = require('./serviceAccountKey.json');
 
 admin.initializeApp({
@@ -26,16 +18,14 @@ async function purge() {
       const toDelete = docs.slice(0, docs.length - RETENTION_LIMIT);
       toDelete.forEach(doc => batch.delete(doc.ref));
       await batch.commit();
-      console.log(`✅ [SRE] Purga concluída. ${toDelete.length} registros removidos.`);
+      console.log(`[SRE] Purga realizada. ${toDelete.length} documentos removidos.`);
     } else {
-      console.log("✅ [SRE] Memória nominal. (Abaixo do limite de 40).");
+      console.log("[SRE] Memória dentro dos limites (limite de 40).");
     }
-  } catch (e) {
-    console.error("❌ [SRE] Erro no Firestore:", e.message);
-    process.exit(1);
+  } catch (error) {
+    console.error("[SRE] Falha na purga:", error.message);
   } finally {
-    process.exit(0);
+    process.exit();
   }
 }
-
 purge();
