@@ -59,7 +59,7 @@ app.post("/search", async (req, res) => {
     try {
         // Modelo atualizado para versão estável
         const model = genAI.getGenerativeModel({
-            model: "gemini-3.1-flash-lite", 
+            model: "gemini-1.5-flash", 
             systemInstruction: `Você é o Sentinela-Bash IA, unidade CLI do projeto Minha IA Memória. 
             Responda de forma técnica e direta. 
             Sempre forneça o comando formatado em blocos de código markdown, exemplo: \`$ comando\`. 
