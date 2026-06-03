@@ -5,7 +5,7 @@ const axios = require("axios");
 const admin = require("firebase-admin");
 const fs = require("fs");
 
-// --- 1. CONFIGURAÇÃO DE MEMÓRIA SRE v2.2 ---
+// --- 1. CONFIGURAÇÃO DE MEMÓRIA SRE v2.3 ---
 let serviceAccount = null;
 
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
@@ -13,26 +13,23 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
         serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
         console.log("✅ [SRE] Firebase: Carregado via Variável de Ambiente.");
     } catch (e) {
-        console.error("❌ [SRE] Erro ao parsear FIREBASE_SERVICE_ACCOUNT. Verifique o JSON.");
+        console.error("❌ [SRE] Erro no JSON da variável FIREBASE_SERVICE_ACCOUNT.");
     }
 } else if (fs.existsSync("./serviceAccountKey.json")) {
     serviceAccount = require("./serviceAccountKey.json");
     console.log("📱 [SRE] Firebase: Carregado via Arquivo Local.");
-} else {
-    console.error("🚨 [FALHA CRÍTICA] Nenhuma credencial Firebase encontrada!");
-    console.error("DICA: Configure a variável FIREBASE_SERVICE_ACCOUNT no Render.");
 }
 
-// Inicialização segura
+// Inicialização segura do Firebase
 if (serviceAccount) {
     if (!admin.apps.length) {
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount)
         });
-        console.log("🚀 [SRE] Firebase Admin inicializado com sucesso.");
+        console.log("🚀 [SRE] Firebase Admin inicializado.");
     }
 } else {
-    console.error("⚠️ [SRE] O backend continuará sem persistência (Modo Degradado).");
+    console.warn("⚠️ [SRE] Backend rodando sem persistência (Modo Degradado).");
 }
 
 const db = serviceAccount ? admin.firestore() : null;
@@ -40,61 +37,73 @@ const db = serviceAccount ? admin.firestore() : null;
 const app = express();
 app.use(cors());
 app.use(express.json());
+// Servir a pasta public (frontend) pelo backend também
+app.use(express.static("public"));
 
 const PORT = process.env.PORT || 10000;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-app.get("/", (req, res) => res.send("BashSearch API v2.2 - SRE Resiliente Online"));
-app.get("/ping", (req, res) => res.json({ status: "online", unit: "CLI-Unit", version: "2.3" }));
+// Rotas de Status
+app.get("/ping", (req, res) => res.json({ 
+    status: "online", 
+    unit: "CLI-Unit", 
+    version: "2.3",
+    db_active: !!db 
+}));
 
+// Rota Principal de Busca (IA)
 app.post("/search", async (req, res) => {
     const { prompt } = req.body;
+    if (!prompt) return res.status(400).json({ error: "Prompt vazio" });
+
     try {
+        // Modelo atualizado para versão estável
         const model = genAI.getGenerativeModel({
-            model: "gemini-3.1-flash-lite",
-            systemInstruction: "Você é o Sentinela-Bash IA, a Unidade CLI do projeto Minha IA Memória. Retorne o comando Termux precedido por $, uma explicação simples e como instalar."
+            model: "gemini-1.5-flash", 
+            systemInstruction: `Você é o Sentinela-Bash IA, unidade CLI do projeto Minha IA Memória. 
+            Responda de forma técnica e direta. 
+            Sempre forneça o comando formatado em blocos de código markdown, exemplo: \`$ comando\`. 
+            Inclua uma breve explicação e o comando de instalação (pkg install ou apt install).`
         });
 
         const result = await model.generateContent(prompt);
         const respostaTexto = result.response.text();
 
-        // Persistência condicional (só se o DB estiver ativo)
+        // Salvar no Firestore se disponível
         if (db) {
-            await db.collection("historico").add({
+            db.collection("historico").add({
                 usuario_query: prompt,
                 ia_resposta: respostaTexto,
                 timestamp: admin.firestore.FieldValue.serverTimestamp(),
-                versao: "2.2-resiliente"
-            }).catch(e => console.error("Erro ao salvar no Firestore:", e.message));
+                versao: "2.3-sentinela"
+            }).catch(e => console.error("Erro Firestore:", e.message));
         }
 
         res.json({ resposta: respostaTexto });
     } catch (e) {
         console.error("❌ ERRO GEMINI:", e.message);
-        res.status(500).json({ error: "Erro na Unidade de IA" });
+        res.status(500).json({ error: "Erro na Unidade de Processamento de IA" });
     }
 });
 
-app.listen(PORT, () => console.log(`✅ Servidor v2.2 Rodando na porta ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Sentinela-Bash v2.3 rodando na porta ${PORT}`));
 
+// Keep-alive: Evita que o Render hiberne (ping a cada 14 min)
 setInterval(() => {
-    axios.get("https://bash-search-backend.onrender.com").catch(() => {});
+    axios.get(`https://bash-search-backend.onrender.com/ping`).catch(() => {});
 }, 840000);
+
+// Listener em tempo real (Opcional - Debug no Console)
 if (db) {
-  console.log("📡 [SENTINELA] Ativando listener do Firestore...");
-
-  db.collection("historico")
-    .orderBy("timestamp", "desc")
-    .limit(1)
-    .onSnapshot(snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === "added") {
-          const data = change.doc.data();
-
-          console.log("🧠 [SENTINELA DETECTOU NOVA ENTRADA]");
-          console.log("Prompt:", data.usuario_query);
-          console.log("Resposta:", data.ia_resposta);
-        }
+    db.collection("historico")
+      .orderBy("timestamp", "desc")
+      .limit(1)
+      .onSnapshot(snapshot => {
+          snapshot.docChanges().forEach(change => {
+              if (change.type === "added") {
+                  const data = change.doc.data();
+                  console.log(`\n🤖 [SENTINELA] Nova interação registrada: "${data.usuario_query.substring(0, 30)}..."`);
+              }
+          });
       });
-    });
 }
