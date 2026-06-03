@@ -1,0 +1,26 @@
+ls - listar arquivos e diretorios
+cd - mudar de diretorio
+pwd - mostrar caminho atual
+mkdir - criar pasta
+rmdir - remover pasta vazia
+rm - remover arquivos ou pastas
+cp - copiar arquivos
+mv - mover ou renomear arquivos
+cat - mostrar conteudo de arquivo
+echo - imprimir texto na tela
+clear - limpar terminal
+touch - criar arquivo vazio
+nano - editor de texto no terminal
+vim - editor avancado
+chmod - alterar permissoes de arquivos
+chown - mudar dono do arquivo
+grep - buscar texto dentro de arquivos
+find - procurar arquivos no sistema
+ps - listar processos
+kill - encerrar processos
+df - mostrar espaco em disco
+du - uso de espaco por arquivos
+uname - informacoes do sistema
+whoami - usuario atual
+history - historico de comandos
+man - manual de comandos

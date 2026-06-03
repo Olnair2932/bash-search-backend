@@ -80,21 +80,3 @@ app.listen(PORT, () => console.log(`✅ Servidor v2.2 Rodando na porta ${PORT}`)
 setInterval(() => {
     axios.get("https://bash-search-backend.onrender.com").catch(() => {});
 }, 840000);
-if (db) {
-  console.log("📡 [SENTINELA] Ativando listener do Firestore...");
-
-  db.collection("historico")
-    .orderBy("timestamp", "desc")
-    .limit(1)
-    .onSnapshot(snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === "added") {
-          const data = change.doc.data();
-
-          console.log("🧠 [SENTINELA DETECTOU NOVA ENTRADA]");
-          console.log("Prompt:", data.usuario_query);
-          console.log("Resposta:", data.ia_resposta);
-        }
-      });
-    });
-}

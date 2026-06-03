@@ -45,7 +45,6 @@ const PORT = process.env.PORT || 10000;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.get("/", (req, res) => res.send("BashSearch API v2.2 - SRE Resiliente Online"));
-app.get("/ping", (req, res) => res.json({ status: "online", unit: "CLI-Unit", version: "2.3" }));
 
 app.post("/search", async (req, res) => {
     const { prompt } = req.body;
@@ -80,21 +79,3 @@ app.listen(PORT, () => console.log(`✅ Servidor v2.2 Rodando na porta ${PORT}`)
 setInterval(() => {
     axios.get("https://bash-search-backend.onrender.com").catch(() => {});
 }, 840000);
-if (db) {
-  console.log("📡 [SENTINELA] Ativando listener do Firestore...");
-
-  db.collection("historico")
-    .orderBy("timestamp", "desc")
-    .limit(1)
-    .onSnapshot(snapshot => {
-      snapshot.docChanges().forEach(change => {
-        if (change.type === "added") {
-          const data = change.doc.data();
-
-          console.log("🧠 [SENTINELA DETECTOU NOVA ENTRADA]");
-          console.log("Prompt:", data.usuario_query);
-          console.log("Resposta:", data.ia_resposta);
-        }
-      });
-    });
-}

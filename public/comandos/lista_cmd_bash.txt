@@ -1,0 +1,169 @@
+
+alias - cria atalhos para comandos
+alias - cria um apelido para um comando longo
+alias up="pkg update && pkg upgrade" - Cria um atalho para atualizar todo o Termux
+alias up='pkg update && pkg upgrade' - Cria um atalho para atualizar o Termux completo
+apt - gerenciador de pacotes (instalar programas)
+awk - linguagem de processamento de dados em colunas
+bat - O comando cat com realce de sintaxe e numeração de linhas
+bg - move uma tarefa para o segundo plano
+btop - Monitor de recursos moderno com visual incrível
+cat - mostrar conteudo de arquivo
+cat arquivo.txt | wc -l - Conta rapidamente quantas linhas existem em um arquivo
+cat lista.txt | sort | uniq -c - Conta quantas vezes cada linha se repete em um arquivo
+cd - mudar diretorio
+chmod +x script.sh && ./script.sh - Torna um arquivo executavel e o roda imediatamente
+chmod - alterar permissoes de arquivos
+chown - mudar dono de arquivo
+clear - limpar terminal
+command > arquivo.txt 2>&1 - Salva tanto o resultado quanto os erros de um comando num arquivo
+cp - copiar arquivos
+curl - transfere dados de/para um servidor (baixar arquivos/API)
+curl -I https://google.com - Verifica apenas o cabeçalho HTTP de um site (otimo para testes)
+curl -s https://ifconfig.me - Comando rapido para descobrir seu endereço IP publico
+date - mostra a data e hora atual
+descrição
+df - mostrar espaco em disco
+df -h | grep '^/dev/' - Mostra o espaço em disco apenas das partições fisicas reais
+diff - compara a diferenca entre dois arquivos
+dig - Consulta informacoes de DNS de um dominio
+du - uso de espaco por arquivos
+du -sh * | sort -h - Lista pastas e arquivos mostrando o tamanho real ocupado em disco
+du -sh * | sort -h - Mostra o tamanho de pastas ordenadas da menor para a maior
+echo - imprimir texto na tela
+exit - encerra a sessao do terminal
+export - define uma variavel de ambiente
+eza - Uma versao moderna e colorida do comando ls
+fd - Uma alternativa simples e rapida ao comando find
+fg - traz uma tarefa para o primeiro plano (foreground)
+find - procurar arquivos no sistema
+find . -type f -empty -delete - Encontra e apaga todos os arquivos vazios recursivamente
+find . -type f -mtime -1 - Encontra todos os arquivos modificados nas ultimas 24 horas
+find . -type f -size +100M - Encontra arquivos maiores que 100MB na pasta atual
+free - mostra o uso da memoria RAM
+free -m | awk 'NR==2{print "Uso de RAM: " $3*100/$2 "%"}' - Calcula a porcentagem de RAM em uso
+fzf - Buscador difuso (fuzzy finder) ultra rapido para arquivos e comandos
+git branch - Lista, cria ou deleta ramificacoes (branches)
+git checkout - Alterna entre diferentes branches ou versoes
+git diff - Mostra as alteracoes entre arquivos ou commits
+git log - Exibe o historico de commits do projeto
+git remote - Gerencia as conexoes com repositorios remotos (ex: GitHub)
+git status - Mostra o estado atual dos arquivos no seu repositorio
+grep - buscar texto dentro de arquivos
+grep -r "texto" . - Busca uma palavra em todos os arquivos da pasta atual recursivamente
+grep -r "texto_procurado" . - Busca uma palavra dentro de todos os arquivos da pasta atual e subpastas
+head - mostra as primeiras linhas de um arquivo
+history - historico de comandos
+history - mostra o historico de comandos digitados
+history | grep "comando" - Busca no seu historico quando voce usou um comando especifico
+history | grep "git" - Procura no seu historico todos os comandos Git que voce ja usou
+htop - Monitor de processos interativo e colorido (melhor que o top)
+ifconfig - mostra informacoes de rede (ip, mac)
+ip route | grep default - Descobre rapidamente o endereço IP do seu roteador (Gateway)
+jobs - lista tarefas em segundo plano (background)
+jq - Processador de arquivos JSON via linha de comando
+kill - encerrar processos
+ls - listar arquivos e diretorios
+ls -l | grep "^d" - Lista apenas os diretorios (pastas) do local atual
+ls -lhS - Lista arquivos ordenando pelo tamanho (maiores primeiro)
+lsof - Lista todos os arquivos e portas abertos por processos
+man - manual de comandos
+man -k "network" - Pesquisa no manual por todos os comandos relacionados a rede
+mkdir - criar pasta
+mkdir -p pasta/sub/sub - Cria uma estrutura de pastas aninhadas de uma so vez
+mkdir -p pasta/{src,bin,doc} - Cria uma estrutura completa de pastas de uma so vez
+mv - mover ou renomear arquivos
+nano - editor de texto no terminal
+ncdu - Analisador de uso de disco interativo para o terminal
+netstat - mostra conexoes de rede ativas
+nmap - Ferramenta de exploracao de rede e varredura de portas
+nohup - Executa um comando que ignora sinais de fechamento de sessao
+ping - testa a conexao com um site ou IP
+ping - testar conectividade de rede
+pkg - gerenciador de pacotes oficial do Termux
+pkill -f nome_app - Fecha todos os processos de um programa pelo nome de uma vez
+pkill -f nome_do_processo - Mata todos os processos que contenham um nome especifico
+pm2 dashboard - Abre o painel de monitoramento completo com graficos e logs (alias: dash)
+pm2 delete nome_app - Remove um processo da lista do PM2
+pm2 describe 0 - Exibe detalhes tecnicos completos de um processo (caminhos, IDs, logs)
+pm2 env 0 - Lista todas as variaveis de ambiente de um processo especifico
+pm2 flush - Limpa todos os arquivos de log acumulados
+pm2 id nome_app - Retorna o ID numerico de um processo através do seu nome
+pm2 list - Lista todos os processos gerenciados pelo PM2
+pm2 logs - Mostra os logs em tempo real de todos os processos
+pm2 logs --time - Exibe os logs do sistema com carimbo de data e hora (timestamps)
+pm2 monit - Abre um painel de monitoramento interativo (CPU/RAM)
+pm2 reload all - Reinicialização suave (Graceful Reload) sem tempo de inatividade
+pm2 reset all - Reseta os contadores de restarts e erros de todos os processos
+pm2 restart nome_app - Reinicia um processo
+pm2 resurrect - Recupera e inicia todos os processos salvos após um reboot
+pm2 save - Salva a lista atual de processos para reiniciar com o sistema
+pm2 serve ./public 8080 - Cria um servidor web estatico para uma pasta instantaneamente
+pm2 show 0 - Mostra informacoes detalhadas sobre um processo especifico
+pm2 show nome_app - Mostra informações detalhadas de um processo
+pm2 start app.js - Inicia um script Node.js em segundo plano
+pm2 start app.js --cron "0 0 * * *" - Agenda o reinicio de um app usando padrao cron
+pm2 start app.js --max-memory-restart 100M - Reinicia o app se ele ultrapassar o limite de RAM definido
+pm2 start app.js --no-autorestart - Inicia um script mas desativa a reinicialização automatica
+pm2 start app.js --watch - Monitora mudanças nos arquivos e reinicia o app automaticamente
+pm2 start script.sh --interpreter bash - Inicia um script Shell no PM2
+pm2 startup - Gera o comando para iniciar o PM2 junto com o boot
+pm2 stop nome_app - Para a execução de um processo especifico
+pm2 unstartup - Desativa a inicialização automatica do PM2 no boot do sistema
+pm2 updatePM2 - Atualiza o daemon do PM2 que esta rodando na memoria do sistema
+printf - imprime texto formatado (mais potente que echo)
+ps - listar processos
+ps aux --sort=-%mem | head - Lista os processos que mais estao consumindo memoria RAM
+ps aux | grep python - Busca todos os processos ativos que envolvem 'python'
+pwd - mostrar caminho atual
+python -m http.server 8080 - Cria um servidor web instantaneo na pasta atual
+read - le uma entrada do teclado e salva em variavel
+readonly - torna uma variavel somente leitura
+ripgrep - Uma alternativa extremamente rapida ao grep (comando: rg)
+rm - remover arquivos ou pastas
+rmdir - remover pasta vazia
+scp - copia arquivos entre computadores via rede
+screen - Mantem processos rodando mesmo se o terminal fechar
+sed - editor de fluxo para filtrar e transformar texto
+sed -i 's/antigo/novo/g' *.txt - Substitui uma palavra por outra em todos os arquivos .txt de uma vez
+set - define opcoes do shell e variaveis
+sort - ordena as linhas de um texto
+source - executa um script no shell atual
+ssh - conecta em servidores remotos com seguranca
+ssh-copy-id usuario@ip - Copia sua chave SSH para um servidor para logar sem senha
+ssh-keygen - Gera chaves para autenticacao SSH segura
+ssh-keygen -t rsa -b 4096 - Cria uma chave de seguranca forte para acessar servidores
+strace - Rastreia chamadas de sistema e sinais de um programa
+sudo !! - Executa o ultimo comando digitado novamente, mas como super-usuario (root)
+tail - mostra as ultimas linhas de um arquivo
+tail -f access.log | grep "404" - Monitora um log em tempo real filtrando apenas erros 404
+tail -f log.txt | grep "ERROR" - Monitora um arquivo de log em tempo real filtrando apenas erros
+tar - compacta ou extrai arquivos (.tar, .gz)
+tar -cvzf backup.tar.gz pasta/ - Cria um backup compactado de uma pasta inteira
+tar -tzf arquivo.tar.gz - Lista o conteudo de um arquivo compactado sem precisar extrair
+tar -xvzf - Extrai arquivos compactados .tar.gz
+termux-battery-status - Mostra informacoes da bateria do celular
+termux-open-url - Abre um link diretamente no navegador do Android
+termux-setup-storage - Concede permissao ao Termux para acessar arquivos do celular
+termux-vibrate - Faz o celular vibrar via comando (instale termux-api)
+tldr - Exemplos praticos e simplificados de comandos (alternativa ao man)
+tmux - Multiplexador de terminais (permite varias janelas em uma tela)
+top - monitorar processos em tempo real
+touch - criar arquivo vazio
+ulimit - define limites de recursos do sistema
+umask - define permissoes padrao para novos arquivos
+unalias - remove um atalho criado
+uname - informacoes do sistema
+uniq - remove linhas duplicadas de um arquivo
+unset - remove uma variavel ou funcao
+unzip - extrai arquivos .zip
+uptime - mostra ha quanto tempo o sistema esta ligado
+vim - editor avancado
+wait - espera um processo terminar
+watch -n 1 "ls -l" - Executa o comando ls a cada 1 segundo para monitorar mudanças
+wget - baixa arquivos da internet diretamente
+who - mostra quem esta logado no sistema
+whoami - usuario atual
+whois - Busca informacoes de registro de um dominio ou IP
+zip - compacta arquivos no formato .zip
+zoxide - Um comando cd inteligente que aprende seus caminhos (comando: z)

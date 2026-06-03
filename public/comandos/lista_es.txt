@@ -1,0 +1,159 @@
+alias - crea un alias para un comando
+apt - gestor de paquetes
+awk - lenguaje de procesamiento de texto
+bat - clon de cat con resaltado de sintaxis
+bg - mover tarea al fondo
+cd - cambiar de directorio
+chmod - cambiar permisos
+clear - limpiar la terminal
+cp - copiar archivos
+curl - transferir datos
+df - mostrar espacio en disco
+diff - comparar archivos
+du - uso de disco
+echo - imprimir en pantalla
+exit - cerrar sesion
+export - variable de entorno
+find - buscar archivos
+git - control de versiones
+grep - buscar texto
+history - historial de comandos
+htop - monitor de procesos
+ls - listar archivos
+man - manual de comandos
+mkdir - crear carpeta
+mv - mover archivos
+nano - editor de texto
+ping - probar red
+pkg - gestor de Termux
+pm2 - gestor de procesos
+ps - lista de procesos
+pwd - ruta actual
+rm - eliminar archivos
+sed - editor de flujo
+ssh - conexion remota
+tar - comprimir archivos
+touch - crear archivo
+uptime - tiempo encendido
+vim - editor avanzado
+EOF
+
+# 4. Reescrever o index.html com a Lógica de Troca de Arquivos Integrada
+cat << 'EOT' > public/index.html
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bash Search Pro</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00ff41">
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #0a0a0c; --card: #121214; --accent: #00ff41; --text: #e1e1e6; --dim: #888; --border: #29292e; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .wrapper { width: 100%; max-width: 600px; position: relative; }
+        .top-actions { position: absolute; right: 0; top: 0; display: flex; gap: 15px; align-items: center; }
+        .action-btn { color: var(--dim); cursor: pointer; font-size: 1.2rem; transition: 0.3s; }
+        #langBtn { font-size: 0.8rem; font-weight: bold; border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px; }
+        header h1 { font-family: 'Fira Code', monospace; color: var(--accent); text-align: center; font-size: 1.5rem; margin-bottom: 5px; }
+        .subtitle { color: var(--dim); text-align: center; font-size: 0.8rem; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; background: var(--card); border: 2px solid var(--border); border-radius: 8px; color: white; font-family: 'Fira Code', monospace; outline: none; box-sizing: border-box; }
+        ul { list-style: none; padding: 0; margin-top: 20px; }
+        li { background: var(--card); margin-bottom: 10px; padding: 15px; border-radius: 8px; border: 1px solid var(--border); border-left: 4px solid var(--border); display: flex; flex-direction: column; cursor: pointer; position: relative; transition: 0.2s; }
+        .cmd { color: var(--accent); font-family: 'Fira Code', monospace; font-weight: bold; font-size: 1.1rem; }
+        .desc { color: var(--dim); font-size: 0.9rem; margin-top: 6px; }
+        .copy-badge { position: absolute; right: 10px; top: 10px; background: var(--accent); color: black; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; opacity: 0; }
+        li.copied .copy-badge { opacity: 1; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+        .modal-content { background: var(--card); padding: 30px; border-radius: 12px; border: 1px solid var(--border); max-width: 85%; text-align: center; }
+        .close-modal { margin-top: 20px; padding: 10px 20px; background: var(--accent); color: black; border: none; border-radius: 6px; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="top-actions">
+        <div class="action-btn" id="langBtn">PT</div>
+        <div class="action-btn" id="shareBtn">🔗</div>
+        <div class="action-btn" onclick="toggleModal(true)">ⓘ</div>
+    </div>
+    <header><h1>root@termux:~# search_</h1></header>
+    <div id="ui-subtitle" class="subtitle"></div>
+    <input type="text" id="search" placeholder="" autofocus>
+    <ul id="lista"></ul>
+</div>
+
+<div id="aboutModal" class="modal">
+    <div class="modal-content">
+        <h2 id="ui-modal-title"></h2>
+        <p id="ui-modal-desc"></p>
+        <p><strong id="ui-devs"></strong><br>Olnair Pereira & IA Gemini</p>
+        <button id="ui-close" class="close-modal" onclick="toggleModal(false)"></button>
+    </div>
+</div>
+
+<script type="module">
+    import firebaseConfig from './config.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    initializeApp(firebaseConfig);
+
+    const translations = {
+        pt: { file: 'lista_cmd_bash.txt', subtitle: "Toque no comando para copiar", placeholder: "Buscar comando...", modalTitle: "Sobre", modalDesc: "Buscador para Termux.", devs: "Devs:", close: "FECHAR", copied: "COPIADO!", share: "Olha esse buscador Bash!" },
+        en: { file: 'lista_en.txt', subtitle: "Tap command to copy", placeholder: "Search command...", modalTitle: "About", modalDesc: "Searcher for Termux.", devs: "Devs:", close: "CLOSE", copied: "COPIED!", share: "Check this Bash searcher!" },
+        es: { file: 'lista_es.txt', subtitle: "Toca el comando para copiar", placeholder: "Buscar comando...", modalTitle: "Sobre", modalDesc: "Buscador para Termux.", devs: "Devs:", close: "CERRAR", copied: "¡COPIADO!", share: "¡Mira este buscador!" }
+    };
+
+    let currentLang = 'pt';
+    let baseDados = [];
+
+    async function carregar() {
+        const t = translations[currentLang];
+        document.getElementById('ui-subtitle').innerText = t.subtitle;
+        document.getElementById('search').placeholder = t.placeholder;
+        document.getElementById('ui-modal-title').innerText = t.modalTitle;
+        document.getElementById('ui-modal-desc').innerText = t.modalDesc;
+        document.getElementById('ui-devs').innerText = t.devs;
+        document.getElementById('ui-close').innerText = t.close;
+        document.getElementById('langBtn').innerText = currentLang.toUpperCase();
+
+        const res = await fetch('comandos/' + t.file);
+        const texto = await res.text();
+        baseDados = texto.split('\n').filter(l => l.includes(' - ')).map(l => {
+            const [n, d] = l.split(' - '); return { nome: n.trim(), desc: d.trim() };
+        });
+        mostrar(baseDados);
+    }
+
+    document.getElementById('langBtn').onclick = () => {
+        currentLang = currentLang === 'pt' ? 'en' : (currentLang === 'en' ? 'es' : 'pt');
+        carregar();
+    };
+
+    window.toggleModal = (s) => document.getElementById('aboutModal').style.display = s ? 'flex' : 'none';
+    window.copiarComando = (el, txt) => {
+        navigator.clipboard.writeText(txt).then(() => {
+            el.classList.add('copied');
+            setTimeout(() => el.classList.remove('copied'), 1500);
+        });
+    };
+
+    function mostrar(itens) {
+        document.getElementById('lista').innerHTML = itens.map(i => `
+            <li onclick="copiarComando(this, '${i.nome}')">
+                <span class="copy-badge">${translations[currentLang].copied}</span>
+                <span class="cmd">$ ${i.nome}</span>
+                <span class="desc">${i.desc}</span>
+            </li>`).join('');
+    }
+
+    document.getElementById('search').oninput = (e) => {
+        const val = e.target.value.toLowerCase();
+        mostrar(baseDados.filter(i => i.nome.includes(val) || i.desc.includes(val)));
+    };
+
+    carregar();
+    if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>

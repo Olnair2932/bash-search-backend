@@ -1,0 +1,38 @@
+alias - creates an alias for a command
+apt - package manager (install programs)
+awk - text processing language
+bat - cat clone with syntax highlighting
+bg - move a task to background
+cd - change directory
+chmod - change file permissions
+clear - clear the terminal
+cp - copy files
+curl - transfer data from/to a server
+df - show disk space
+diff - compare two files
+du - disk usage by files
+echo - print text to screen
+exit - close terminal session
+export - set environment variable
+find - search for files
+git - version control system
+grep - search text inside files
+history - show command history
+htop - interactive process monitor
+ls - list files and directories
+man - command manuals
+mkdir - create folder
+mv - move or rename files
+nano - terminal text editor
+ping - test network connection
+pkg - Termux package manager
+pm2 - background process manager
+ps - list active processes
+pwd - show current path
+rm - remove files or folders
+sed - stream editor
+ssh - secure remote connection
+tar - compress or extract files
+touch - create empty file
+uptime - show system uptime
+vim - advanced text editor
