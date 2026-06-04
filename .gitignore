@@ -1,9 +1,10 @@
-node_modules
-*.json
+# Dependencias
+node_modules/
+
+# Segredos e Credenciais (CRITICO)
 serviceAccountKey.json
 .env
-serviceAccountKey.json
-.env
-serviceAccountKey.json
-.env
-serviceAccountKey.json
+
+# Logs e arquivos de sistema
+npm-debug.log*
+.DS_Store
