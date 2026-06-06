@@ -3,119 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sentinela IA | Bash Search Pro</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#00ff41">
-    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
-    
-    <!-- Scripts Externos -->
+    <title>BashSearch | Sentinela IA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
-
     <style>
-        :root {
-            --accent: #00FF00;
-            --bg: #0c0c0c;
-            --card: #161616;
-        }
-        body { 
-            background-color: var(--bg); 
-            font-family: 'Fira Code', monospace; 
-            color: #e0e0e0; 
-        }
-        .terminal-glow { 
-            color: var(--accent); 
-            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5); 
-        }
-        .input-bash { 
-            background: #000; 
-            border: 1px solid #333; 
-            transition: all 0.3s ease;
-        }
-        .input-bash:focus { 
-            border-color: var(--accent); 
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
-            outline: none; 
-        }
-        .card-cmd {
-            background: var(--card);
-            border-left: 4px solid #333;
-            transition: 0.2s;
-        }
-        .card-cmd:hover {
-            border-left-color: var(--accent);
-            transform: translateX(5px);
-        }
-        /* Markdown Style */
+        body { background-color: #0c0c0c; font-family: 'Fira Code', monospace; color: #e0e0e0; }
+        .terminal-glow { color: #00FF00; text-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
+        .card-bash { background-color: #161616; border: 1px solid #222; border-left: 4px solid #00FF00; transition: 0.3s; }
+        .card-bash:hover { border-left-width: 8px; background-color: #1a1a1a; }
+        .input-bash { background: #000; border: 1px solid #333; color: #fff; outline: none; }
+        .input-bash:focus { border-color: #00FF00; box-shadow: 0 0 15px rgba(0, 255, 0, 0.1); }
         .prose pre { background: #000 !important; border: 1px solid #333; padding: 10px; border-radius: 8px; }
-        .prose code { color: var(--accent) !important; }
+        .prose code { color: #00FF00 !important; }
     </style>
 </head>
 <body class="p-4 max-w-2xl mx-auto mb-20">
 
-    <!-- Header -->
     <header class="text-center mt-6 mb-8">
         <h1 class="text-3xl font-bold terminal-glow mb-1">root@termux:~# search_</h1>
-        <p class="text-[10px] text-gray-500 uppercase tracking-[0.2em]">Sentinela v1.5 | Project: bash-eee21</p>
+        <p class="text-[9px] text-gray-500 uppercase tracking-widest">Sentinela v2.3 | Unit: cerebro-fba58</p>
     </header>
 
-    <!-- Módulo 1: Sentinela IA -->
+    <!-- IA MODULE -->
     <section class="mb-10 bg-[#111] p-5 rounded-2xl border border-zinc-800 shadow-2xl">
-        <h2 class="text-[#00FF00] text-[10px] font-bold mb-4 flex items-center gap-2 uppercase tracking-widest">
-            <span>🤖</span> Sentinela-Bash IA
-        </h2>
+        <h2 class="text-[#00FF00] text-[10px] font-bold mb-4 flex items-center gap-2 uppercase tracking-widest">🤖 Sentinela-Bash IA</h2>
         <div class="flex gap-2">
-            <input id="ia-prompt" class="flex-1 p-3 rounded-xl input-bash text-sm" placeholder="Perguntar à IA (ex: Como usar o tar?)...">
-            <button id="ia-btn" class="bg-[#00FF00] text-black px-6 rounded-xl font-bold hover:bg-green-400 transition-all active:scale-95">></button>
+            <input id="ia-prompt" class="flex-1 p-3 rounded-xl input-bash text-sm" placeholder="Perguntar à IA...">
+            <button id="ia-btn" class="bg-[#00FF00] text-black px-6 rounded-xl font-bold hover:bg-green-400 transition-all">></button>
         </div>
-        <div id="ia-status" class="hidden text-[10px] text-gray-500 mt-4 animate-pulse">⏳ Processando inteligência artificial...</div>
-        
-        <!-- Local onde aparecem as respostas da IA -->
+        <div id="ia-status" class="hidden text-[10px] text-gray-500 mt-4 animate-pulse">⏳ Processando inteligência...</div>
         <div id="ia-results" class="mt-6 space-y-4"></div>
     </section>
 
-    <!-- Módulo 2: Busca Local de Comandos -->
+    <!-- LOCAL DB MODULE -->
     <section>
-        <div class="flex justify-between items-end mb-4 px-1">
+        <div class="flex justify-between items-center mb-4 px-1">
             <h2 class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Base de Dados Local</h2>
-            <div id="langBtn" class="text-[10px] border border-zinc-700 px-2 py-1 rounded cursor-pointer hover:bg-zinc-800">PT-BR</div>
+            <select id="langBtn" class="bg-black text-[10px] border border-zinc-700 px-2 py-1 rounded text-green-500 outline-none">
+                <option value="pt">PT-BR</option>
+                <option value="en">EN-US</option>
+                <option value="es">ES-ES</option>
+            </select>
         </div>
-        
         <input type="text" id="local-search" class="w-full p-4 rounded-xl input-bash text-sm mb-6" placeholder="Filtrar comandos locais...">
-        
-        <ul id="lista-comandos" class="space-y-3">
-            <!-- Comandos carregados via JS -->
-        </ul>
+        <ul id="lista-comandos" class="space-y-3"></ul>
     </section>
-
-    <!-- Botão Voltar ao Topo -->
-    <button id="backToTop" onclick="window.scrollTo({top:0, behavior:'smooth'})" class="fixed bottom-6 right-6 w-12 h-12 bg-zinc-900 border-2 border-[#00FF00] text-[#00FF00] rounded-full hidden flex items-center justify-center shadow-lg z-50">▲</button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import firebaseConfig from './config.js';
-        import { API_URL } from './config.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyAG1gvUh1ggcU0rwesmxsLwuzbrAfHPlLU",
+            authDomain: "bash-eee21.firebaseapp.com",
+            databaseURL: "https://bash-eee21-default-rtdb.firebaseio.com",
+            projectId: "bash-eee21",
+            storageBucket: "bash-eee21.firebasestorage.app",
+            messagingSenderId: "1068325548191",
+            appId: "1:1068325548191:web:3bdbee9c95aacdcbf232aa"
+        };
 
-        // Inicialização
         initializeApp(firebaseConfig);
+        const API_URL = "https://bash-search-backend.onrender.com";
 
         const iaBtn = document.getElementById('ia-btn');
         const iaPrompt = document.getElementById('ia-prompt');
-        const iaStatus = document.getElementById('ia-status');
         const iaResults = document.getElementById('ia-results');
+        const iaStatus = document.getElementById('ia-status');
         const localSearch = document.getElementById('local-search');
         const listaUl = document.getElementById('lista-comandos');
-        const btt = document.getElementById('backToTop');
+        const langBtn = document.getElementById('langBtn');
 
         let baseDados = [];
-        let currentLang = 'pt';
 
-        // --- FUNÇÕES DA IA ---
         async function perguntarIA() {
             const prompt = iaPrompt.value.trim();
             if(!prompt) return;
-
             iaStatus.classList.remove('hidden');
             iaBtn.disabled = true;
 
@@ -126,98 +89,78 @@
                     body: JSON.stringify({ prompt })
                 });
                 const data = await res.json();
-                
                 const div = document.createElement('div');
-                div.className = 'bg-black p-5 rounded-xl border border-green-900/30 shadow-inner';
+                div.className = 'card-bash p-5 rounded-xl shadow-xl';
                 div.innerHTML = `
-                    <div class="flex justify-between items-center mb-4">
-                        <span class="text-[9px] text-green-500 font-bold uppercase tracking-tighter">Resposta da IA</span>
-                        <button onclick="window.copyContent(this)" class="text-[9px] bg-zinc-800 px-3 py-1 rounded hover:bg-green-600 transition-all uppercase">Copiar</button>
+                    <div class="flex justify-between items-center mb-3 text-[9px]">
+                        <span class="text-green-500 font-bold uppercase font-mono">IA Response</span>
+                        <button onclick="window.copy(this)" class="bg-zinc-800 px-2 py-1 rounded hover:bg-green-600">COPIAR</button>
                     </div>
-                    <div class="text-sm prose prose-invert max-w-none leading-relaxed">${marked.parse(data.resposta)}</div>
+                    <div class="text-sm prose prose-invert max-w-none">${marked.parse(data.resposta)}</div>
                 `;
                 iaResults.prepend(div);
                 iaPrompt.value = '';
-            } catch (e) {
-                alert("Erro: Backend offline ou instável.");
-            } finally {
-                iaStatus.classList.add('hidden');
-                iaBtn.disabled = false;
-            }
+            } catch (e) { alert("Erro ao conectar com o Backend."); }
+            finally { iaStatus.classList.add('hidden'); iaBtn.disabled = false; }
         }
 
-        // --- FUNÇÕES DA BUSCA LOCAL ---
         async function carregarComandos() {
             try {
-                const files = { pt: 'lista_cmd_bash.txt', en: 'lista_en.txt', es: 'lista_es.txt' };
-                const res = await fetch('comandos/' + files[currentLang]);
-                const texto = await res.text();
+                const lang = langBtn.value;
+                // Ajustado para o caminho correto relativo à pasta public
+                const mapping = { pt: 'lista_cmd_bash.txt', en: 'lista_en.txt', es: 'lista_es.txt' };
+                const res = await fetch(`./comandos/${mapping[lang]}`);
                 
+                if (!res.ok) throw new Error("Arquivo não encontrado");
+                
+                const texto = await res.text();
                 baseDados = texto.split('\n')
-                    .filter(l => l.includes(' - '))
-                    .map(l => {
-                        const [nome, desc] = l.split(' - ');
-                        return { nome: nome.trim(), desc: desc.trim() };
+                    .filter(line => line.includes(' - '))
+                    .map(line => {
+                        const parts = line.split(' - ');
+                        return { nome: parts[0].trim(), desc: parts[1].trim() };
                     });
                 renderizarLista(baseDados);
             } catch (e) {
-                console.error("Erro ao carregar lista:", e);
+                console.error(e);
+                listaUl.innerHTML = `<li class="text-red-500 text-xs italic">Erro ao carregar lista de comandos (${langBtn.value}).</li>`;
             }
         }
 
         function renderizarLista(itens) {
             listaUl.innerHTML = itens.map(i => `
-                <li onclick="window.copyToClipboard(this, '${i.nome}')" class="card-cmd p-4 rounded-r-xl cursor-pointer relative group">
-                    <div class="flex justify-between items-start">
+                <li onclick="window.copyTxt('${i.nome}')" class="card-bash p-4 rounded-r-xl cursor-pointer group">
+                    <div class="flex justify-between items-center">
                         <span class="text-green-400 font-bold text-sm">$ ${i.nome}</span>
-                        <span class="opacity-0 group-hover:opacity-100 text-[9px] bg-green-500 text-black px-2 py-0.5 rounded transition-all">CLIQUE PARA COPIAR</span>
+                        <span class="opacity-0 group-hover:opacity-100 text-[8px] bg-green-500 text-black px-1.5 py-0.5 rounded">COPIAR</span>
                     </div>
-                    <p class="text-gray-500 text-xs mt-1 leading-snug">${i.desc}</p>
+                    <p class="text-gray-500 text-xs mt-1 leading-tight">${i.desc}</p>
                 </li>
             `).join('');
         }
 
-        // --- UTILITÁRIOS ---
-        window.copyToClipboard = (el, txt) => {
+        window.copyTxt = (txt) => {
             navigator.clipboard.writeText(txt);
-            const original = el.innerHTML;
-            el.style.borderColor = "#00FF00";
-            setTimeout(() => el.style.borderColor = "", 1000);
+            alert("Copiado!");
         };
-
-        window.copyContent = (btn) => {
-            const content = btn.parentElement.nextElementSibling.innerText;
-            navigator.clipboard.writeText(content);
+        
+        window.copy = (btn) => {
+            const code = btn.parentElement.nextElementSibling.innerText;
+            navigator.clipboard.writeText(code);
             btn.innerText = "COPIADO!";
             setTimeout(() => btn.innerText = "COPIAR", 2000);
         };
 
-        // --- EVENTOS ---
         iaBtn.onclick = perguntarIA;
         iaPrompt.onkeypress = (e) => e.key === 'Enter' && perguntarIA();
-
+        langBtn.onchange = carregarComandos;
         localSearch.oninput = (e) => {
             const termo = e.target.value.toLowerCase();
-            const filtrados = baseDados.filter(i => 
-                i.nome.toLowerCase().includes(termo) || 
-                i.desc.toLowerCase().includes(termo)
-            );
+            const filtrados = baseDados.filter(i => i.nome.toLowerCase().includes(termo) || i.desc.toLowerCase().includes(termo));
             renderizarLista(filtrados);
         };
 
-        window.onscroll = () => {
-            btt.style.display = (window.scrollY > 400) ? "flex" : "none";
-        };
-
-        document.getElementById('langBtn').onclick = () => {
-            currentLang = currentLang === 'pt' ? 'en' : (currentLang === 'en' ? 'es' : 'pt');
-            document.getElementById('langBtn').innerText = currentLang.toUpperCase();
-            carregarComandos();
-        };
-
-        // Inicializar aplicação
         carregarComandos();
-        if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
     </script>
 </body>
 </html>
