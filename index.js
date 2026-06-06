@@ -44,11 +44,11 @@ const PORT = process.env.PORT || 10000;
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // Rotas de Status
-app.get("/ping", (req, res) => res.json({ 
-    status: "online", 
-    unit: "CLI-Unit", 
+app.get("/ping", (req, res) => res.json({
+    status: "online",
+    unit: "CLI-Unit",
     version: "2.3",
-    db_active: !!db 
+    db_active: !!db
 }));
 
 // Rota Principal de Busca (IA)
@@ -57,13 +57,14 @@ app.post("/search", async (req, res) => {
     if (!prompt) return res.status(400).json({ error: "Prompt vazio" });
 
     try {
-        // Modelo atualizado para versão estável
+        // AJUSTE NA PERSONALIDADE: RESPOSTA DIRETA (COMANDO + EXPLICAÇÃO)
         const model = genAI.getGenerativeModel({
-            model: "gemini-3.1-flash-lite", 
-            systemInstruction: `Você é o Sentinela-Bash IA, unidade CLI do projeto Minha IA Memória. 
-            Responda de forma técnica e direta. 
-            Sempre forneça o comando formatado em blocos de código markdown, exemplo: \`$ comando\`. 
-            Inclua uma breve explicação e o comando de instalação (pkg install ou apt install).`
+            model: "gemini-3.1-flash-lite", // Versão estável recomendada
+            systemInstruction: `Você é o Sentinela-Bash IA. 
+            Sua resposta deve ser estritamente curta:
+            1. O comando Bash em um bloco de código markdown.
+            2. Uma explicação simples de uma única linha logo abaixo.
+            Não use introduções, conclusões ou explicações detalhadas de parâmetros.`
         });
 
         const result = await model.generateContent(prompt);
@@ -93,7 +94,7 @@ setInterval(() => {
     axios.get(`https://bash-search-backend.onrender.com/ping`).catch(() => {});
 }, 840000);
 
-// Listener em tempo real (Opcional - Debug no Console)
+// Listener em tempo real (Debug no Console)
 if (db) {
     db.collection("historico")
       .orderBy("timestamp", "desc")
