@@ -7,43 +7,46 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="./manifest.json">
     <style>
         body { background-color: #0c0c0c; font-family: 'Fira Code', monospace; color: #e0e0e0; }
         .terminal-glow { color: #00FF00; text-shadow: 0 0 10px rgba(0, 255, 0, 0.5); }
         .card-bash { background-color: #161616; border: 1px solid #222; border-left: 4px solid #00FF00; transition: 0.3s; }
-        .card-bash:hover { border-left-width: 8px; background-color: #1a1a1a; }
         .input-bash { background: #000; border: 1px solid #333; color: #fff; outline: none; }
         .input-bash:focus { border-color: #00FF00; box-shadow: 0 0 15px rgba(0, 255, 0, 0.1); }
-        .prose pre { background: #000 !important; border: 1px solid #333; padding: 10px; border-radius: 8px; }
         .prose code { color: #00FF00 !important; }
+        /* Botão de apagar pequeno e circular */
+        .btn-del { background: #ff4444; color: white; border: none; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; cursor: pointer; flex-shrink: 0; padding: 0; }
     </style>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js");
+      }
+    </script>
 </head>
 <body class="p-4 max-w-2xl mx-auto mb-20">
 
     <header class="text-center mt-6 mb-8">
         <h1 class="text-3xl font-bold terminal-glow mb-1">root@termux:~# search_</h1>
-        <p class="text-[9px] text-gray-500 uppercase tracking-widest">Sentinela v2.3 | Unit: cerebro-fba58</p>
+        <p class="text-[9px] text-gray-500 uppercase tracking-widest">Sentinela v2.5 | Project: bash-eee21</p>
     </header>
 
-    <!-- IA MODULE -->
     <section class="mb-10 bg-[#111] p-5 rounded-2xl border border-zinc-800 shadow-2xl">
         <h2 class="text-[#00FF00] text-[10px] font-bold mb-4 flex items-center gap-2 uppercase tracking-widest">🤖 Sentinela-Bash IA</h2>
         <div class="flex gap-2">
             <input id="ia-prompt" class="flex-1 p-3 rounded-xl input-bash text-sm" placeholder="Perguntar à IA...">
-            <button id="ia-btn" class="bg-[#00FF00] text-black px-6 rounded-xl font-bold hover:bg-green-400 transition-all">></button>
+            <button id="ia-btn" class="bg-[#00FF00] text-black px-6 rounded-xl font-bold hover:bg-green-400">></button>
         </div>
-        <div id="ia-status" class="hidden text-[10px] text-gray-500 mt-4 animate-pulse">⏳ Processando inteligência...</div>
+        <div id="ia-status" class="hidden text-[10px] text-gray-500 mt-4 animate-pulse">⏳ Processando...</div>
         <div id="ia-results" class="mt-6 space-y-4"></div>
     </section>
 
-    <!-- LOCAL DB MODULE -->
     <section>
         <div class="flex justify-between items-center mb-4 px-1">
             <h2 class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Base de Dados Local</h2>
             <select id="langBtn" class="bg-black text-[10px] border border-zinc-700 px-2 py-1 rounded text-green-500 outline-none">
                 <option value="pt">PT-BR</option>
                 <option value="en">EN-US</option>
-                <option value="es">ES-ES</option>
             </select>
         </div>
         <input type="text" id="local-search" class="w-full p-4 rounded-xl input-bash text-sm mb-6" placeholder="Filtrar comandos locais...">
@@ -51,21 +54,7 @@
     </section>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyAG1gvUh1ggcU0rwesmxsLwuzbrAfHPlLU",
-            authDomain: "bash-eee21.firebaseapp.com",
-            databaseURL: "https://bash-eee21-default-rtdb.firebaseio.com",
-            projectId: "bash-eee21",
-            storageBucket: "bash-eee21.firebasestorage.app",
-            messagingSenderId: "1068325548191",
-            appId: "1:1068325548191:web:3bdbee9c95aacdcbf232aa"
-        };
-
-        initializeApp(firebaseConfig);
         const API_URL = "https://bash-search-backend.onrender.com";
-
         const iaBtn = document.getElementById('ia-btn');
         const iaPrompt = document.getElementById('ia-prompt');
         const iaResults = document.getElementById('ia-results');
@@ -76,12 +65,24 @@
 
         let baseDados = [];
 
+        // LÓGICA BOTÃO VOLTAR (ANTI-FECHAMENTO)
+        history.pushState({ page: 1 }, "", "");
+        window.onpopstate = function(event) {
+            if (iaResults.innerHTML !== "" || iaPrompt.value !== "") {
+                iaResults.innerHTML = "";
+                iaPrompt.value = "";
+                // Empurra um novo estado para o usuário ter que clicar "Voltar" de novo para sair
+                history.pushState({ page: 1 }, "", "");
+            } else {
+                history.back();
+            }
+        };
+
         async function perguntarIA() {
             const prompt = iaPrompt.value.trim();
             if(!prompt) return;
             iaStatus.classList.remove('hidden');
             iaBtn.disabled = true;
-
             try {
                 const res = await fetch(`${API_URL}/search`, {
                     method: 'POST',
@@ -90,41 +91,32 @@
                 });
                 const data = await res.json();
                 const div = document.createElement('div');
-                div.className = 'card-bash p-5 rounded-xl shadow-xl';
+                div.className = 'card-bash p-5 rounded-xl shadow-xl mb-4';
                 div.innerHTML = `
                     <div class="flex justify-between items-center mb-3 text-[9px]">
-                        <span class="text-green-500 font-bold uppercase font-mono">IA Response</span>
+                        <span class="text-green-500 font-bold uppercase">Terminal Output</span>
                         <button onclick="window.copy(this)" class="bg-zinc-800 px-2 py-1 rounded hover:bg-green-600">COPIAR</button>
                     </div>
                     <div class="text-sm prose prose-invert max-w-none">${marked.parse(data.resposta)}</div>
                 `;
                 iaResults.prepend(div);
                 iaPrompt.value = '';
-            } catch (e) { alert("Erro ao conectar com o Backend."); }
+            } catch (e) { alert("Backend Offline."); }
             finally { iaStatus.classList.add('hidden'); iaBtn.disabled = false; }
         }
 
         async function carregarComandos() {
             try {
                 const lang = langBtn.value;
-                // Ajustado para o caminho correto relativo à pasta public
-                const mapping = { pt: 'lista_cmd_bash.txt', en: 'lista_en.txt', es: 'lista_es.txt' };
+                const mapping = { pt: 'lista_cmd_bash.txt', en: 'lista_en.txt' };
                 const res = await fetch(`./comandos/${mapping[lang]}`);
-                
-                if (!res.ok) throw new Error("Arquivo não encontrado");
-                
                 const texto = await res.text();
-                baseDados = texto.split('\n')
-                    .filter(line => line.includes(' - '))
-                    .map(line => {
-                        const parts = line.split(' - ');
-                        return { nome: parts[0].trim(), desc: parts[1].trim() };
-                    });
+                baseDados = texto.split('\n').filter(l => l.includes(' - ')).map(l => {
+                    const p = l.split(' - ');
+                    return { nome: p[0].trim(), desc: p[1].trim() };
+                });
                 renderizarLista(baseDados);
-            } catch (e) {
-                console.error(e);
-                listaUl.innerHTML = `<li class="text-red-500 text-xs italic">Erro ao carregar lista de comandos (${langBtn.value}).</li>`;
-            }
+            } catch (e) { console.log(e); }
         }
 
         function renderizarLista(itens) {
@@ -139,11 +131,7 @@
             `).join('');
         }
 
-        window.copyTxt = (txt) => {
-            navigator.clipboard.writeText(txt);
-            alert("Copiado!");
-        };
-        
+        window.copyTxt = (txt) => { navigator.clipboard.writeText(txt); alert("Copiado!"); };
         window.copy = (btn) => {
             const code = btn.parentElement.nextElementSibling.innerText;
             navigator.clipboard.writeText(code);
@@ -152,7 +140,15 @@
         };
 
         iaBtn.onclick = perguntarIA;
-        iaPrompt.onkeypress = (e) => e.key === 'Enter' && perguntarIA();
+        
+        // ENTER ÚNICO: Removemos o duplicado
+        iaPrompt.onkeydown = (e) => { 
+            if(e.key === "Enter") { 
+                e.preventDefault(); 
+                perguntarIA(); 
+            } 
+        };
+
         langBtn.onchange = carregarComandos;
         localSearch.oninput = (e) => {
             const termo = e.target.value.toLowerCase();
